@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quiz Game</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <script src="history.js"></script>
+    <script src="games.js"></script>
+    <script src="animals.js"></script>
+  </head>
+  <body>
+    <div id="gameContainer">
+      <div id="quizContainer">
+        <div id="questionText"></div>
+        <button class="option" id="option1"></button>
+        <button class="option" id="option2"></button>
+        <button class="option" id="option3"></button>
+        <button class="option" id="option4"></button>
+        <div id="scoreText">Score: <span id="score">0</span></div>
+        <div id="answerMessage"></div>
+      </div>
+    </div>
+
+    <div id="gameOverPopup">
+      <h2>Game Over</h2>
+      <p>Your final score: <span id="finalScore">0</span></p>
+      <button id="playAgainButton">Play Again</button>
+    </div>
+
+    <script>
+      const config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        scene: {
+          create: create,
+        },
+      };
+      const correctSound = new Audio("sounds/correct.mp3");
+      const wrongSound = new Audio("sounds/wrong.mp3");
+
+      const game = new Phaser.Game(config);
+
+      var questionText;
+      var optionButtons = [];
+      var currentQuestion = -1;
+      var score = 0;
+
+      var questions = [
+        {
+          question: "Who was the first President of the United States?",
+          options: [
+            "George Washington",
+            "Thomas Jefferson",
+            "John Adams",
+            "Abraham Lincoln",
+          ],
+          answer: 0,
+        },
+        {
+          question: "Which country was the first to circumnavigate the globe?",
+          options: ["Spain", "Portugal", "England", "France"],
+          answer: 0,
+        },
+        {
+          question: "When did World War II end?",
+          options: ["1943", "1944", "1945", "1946"],
+          answer: 2,
+        },
+        {
+          question: "Who painted the Mona Lisa?",
+          options: [
+            "Leonardo da Vinci",
+            "Pablo Picasso",
+            "Vincent van Gogh",
+            "Michelangelo",
+          ],
+          answer: 0,
+        },
+        {
+          question:
+            "Which ancient civilization built the Great Pyramids of Giza?",
+          options: ["Egyptians", "Greeks", "Romans", "Persians"],
+          answer: 0,
+        },
+        {
+          question: "Who wrote the play 'Romeo and Juliet'?",
+          options: [
+            "William Shakespeare",
+            "Jane Austen",
+            "Charles Dickens",
+            "Mark Twain",
+          ],
+          answer: 0,
+        },
+        {
+          question: "Which country was the birthplace of the Renaissance?",
+          options: ["Italy", "France", "Spain", "Germany"],
+          answer: 0,
+        },
+        {
+          question: "Who discovered America?",
+          options: [
+            "Christopher Columbus",
+            "Vasco da Gama",
+            "Ferdinand Magellan",
+            "Amerigo Vespucci",
+          ],
+          answer: 0,
+        },
+
+        {
+          question:
+            "Which war was fought between the North and South in the United States?",
+          options: [
+            "American Revolution",
+            "Civil War",
+            "World War I",
+            "World War II",
+          ],
+          answer: 1,
+        },
+        {
+          question:
+            "Who was the first female Prime Minister of the United Kingdom?",
+          options: [
+            "Margaret Thatcher",
+            "Angela Merkel",
+            "Theresa May",
+            "Jacinda Ardern",
+          ],
+          answer: 0,
+        },
+      ];
+
+      function create() {
+        displayQuestion();
+      }
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function displayQuestion() {
+        currentQuestion++;
+        if (currentQuestion >= questions.length) {
+          showGameOver();
+          return;
+        }
+
+        var currentQuestionData = questions[currentQuestion];
+        questionText = document.getElementById("questionText");
+        questionText.textContent = currentQuestionData.question;
+
+        // for (var i = 0; i < optionButtons.length; i++) {
+        //   optionButtons[i].textContent = "";
+        //   optionButtons[i].removeEventListner("click", optionClickHandler);
+        // }
+
+        for (var i = 0; i < currentQuestionData.options.length; i++) {
+          optionButtons[i] = document.getElementById("option" + (i + 1));
+          optionButtons[i].textContent = currentQuestionData.options[i];
+          optionButtons[i].value = i;
+
+          optionButtons[i].addEventListener("click", optionClickHandler);
+        }
+      }
+
+      function optionClickHandler() {
+        var selectedOptionIndex = parseInt(this.value);
+        checkAnswer(selectedOptionIndex);
+      }
+
+      function checkAnswer(selectedOptionIndex) {
+        var currentQuestionData = questions[currentQuestion];
+        // console.warn(history.length);
+        if (parseInt(selectedOptionIndex) === currentQuestionData.answer) {
+          score += 10;
+          document.getElementById("score").textContent = score;
+          document.getElementById("answerMessage").textContent = "Correct!";
+          document.getElementById("answerMessage").style.color = "green";
+          correctSound.play();
+        } else {
+          score -= 5;
+          document.getElementById("score").textContent = score;
+          document.getElementById("answerMessage").textContent = "Wrong!";
+          document.getElementById("answerMessage").style.color = "red";
+          wrongSound.play();
+        }
+
+        displayQuestion();
+      }
+
+      function showGameOver() {
+        document.getElementById("gameOverPopup").style.display = "block";
+        document.getElementById("finalScore").textContent = score;
+
+        document
+          .getElementById("playAgainButton")
+          .addEventListener("click", function () {
+            restartGame();
+          });
+      }
+
+      function restartGame() {
+        currentQuestion = -1;
+        score = 0;
+        document.getElementById("gameOverPopup").style.display = "none";
+        displayQuestion();
+      }
+
+      function checkAnswer(selectedOptionIndex) {
+  var currentQuestionData = questions[currentQuestion];
+  if (parseInt(selectedOptionIndex) === currentQuestionData.answer) {
+    score += 10;
+    document.getElementById("score").textContent = score;
+    document.getElementById("answerMessage").textContent = "Correct!";
+    document.getElementById("answerMessage").style.color = "green";
+    correctSound.play();
+
+    // Add the GIF animation
+    var gifAnimation = document.createElement("img");
+    gifAnimation.src = "./XVny.gif";
+    gifAnimation.style.position = "absolute";
+    gifAnimation.style.top = "0";
+    gifAnimation.style.left = "0";
+    gifAnimation.style.width = "20%";
+    gifAnimation.style.height = "20%";
+    gifAnimation.style.animation = "slide-down 1s forwards";
+    setTimeout(function() {
+      document.getElementById("gameContainer").removeChild(gifAnimation);
+    }, 1000);
+    gifAnimation.addEventListener("animationend", function () {
+      document.getElementById("gameContainer").removeChild(gifAnimation);
+    });
+
+    document.getElementById("gameContainer").appendChild(gifAnimation);
+  } else {
+    score -= 5;
+document.getElementById("score").textContent = score;
+document.getElementById("answerMessage").textContent = "Wrong!";
+document.getElementById("answerMessage").style.color = "red";
+wrongSound.play();
+var gifAnimation = document.createElement("img");
+    gifAnimation.src = "./200w.gif";
+    gifAnimation.style.position = "absolute";
+    gifAnimation.style.top = "0";
+    gifAnimation.style.left = "0";
+    gifAnimation.style.width = "20%";
+    gifAnimation.style.height = "20%";
+    gifAnimation.style.animation = "slide-down 1s forwards";
+    setTimeout(function() {
+      document.getElementById("gameContainer").removeChild(gifAnimation);
+    }, 1000);
+    gifAnimation.addEventListener("animationend", function () {
+      document.getElementById("gameContainer").removeChild(gifAnimation);
+    });
+    document.getElementById("gameContainer").appendChild(gifAnimation);
+  }
+
+
+  displayQuestion();
+}
+
+    </script>
+  </body>
+</html>
